@@ -70,200 +70,6 @@ A beautifully crafted, feature-rich Flutter movie and TV show discovery app powe
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Flutter (Dart) |
-| Auth & Database | Firebase Authentication + Cloud Firestore |
-| Local Cache | Hive (hive_flutter) |
-| Movie/TV Data | TMDB API v3 |
-| Video Playback | youtube_player_flutter |
-| Image Loading | cached_network_image |
-| Carousel | flutter_carousel_widget |
-| HTTP | http |
-
----
-
-## Architecture
-
-```
-lib/
-├── constants/
-│   └── constants.dart          # API base URLs and endpoint keys
-├── data/
-│   ├── firebase_service.dart   # Firebase Auth + Firestore operations
-│   ├── hive_service.dart       # Local cache: profile + wishlist
-│   └── wishlist_service.dart   # Unified wishlist (Hive + Firestore sync)
-├── model/
-│   ├── movie_model.dart
-│   ├── tv_model.dart
-│   ├── cast_model.dart
-│   └── video_model.dart
-├── service/
-│   └── api_service.dart        # TMDB API calls
-└── ui/
-    ├── login_page.dart
-    ├── signup_page.dart (sign-up + email verification)
-    ├── setup_profile_screen.dart
-    ├── home.dart               # Bottom nav shell (Movies, TV, Wishlist, Profile)
-    ├── movie/
-    │   ├── movie_page.dart
-    │   ├── movies_category.dart
-    │   ├── movie_details.dart
-    │   └── components/
-    │       ├── movie_carousel.dart
-    │       └── movie_list_item.dart
-    ├── tv/
-    │   ├── tv_page.dart
-    │   ├── tv_category.dart
-    │   ├── tv_details.dart
-    │   └── components/
-    │       ├── tv_carusel.dart
-    │       └── tv_list_item.dart
-    ├── components/
-    │   ├── cast_page.dart
-    │   └── cast_list_item.dart
-    ├── wishlist/
-    │   └── wishlist_screen.dart
-    ├── profile/
-    │   ├── profile_screen.dart
-    │   ├── edit_profile_screen.dart
-    │   ├── change_personal_details_screen.dart
-    │   ├── change_email_screen.dart
-    │   └── change_password_screen.dart
-    ├── genres/
-    │   ├── movie_genres_screen.dart
-    │   ├── movie_genre_details_screen.dart
-    │   ├── movie_all_genres_details_screen.dart
-    │   ├── tv_genres_screen.dart
-    │   ├── tv_genre_details_screen.dart
-    │   └── tv_all_genres_details_screen.dart
-    ├── search/
-    │   ├── movie_search_screen.dart
-    │   └── tv_search_screen.dart
-    ├── see_all/
-    │   ├── see_all_movies_screen.dart
-    │   └── tv_see_all_screen.dart
-    └── cast_detail_screen.dart
-```
-
-**Data Flow**
-
-```
-App Launch
-    └── FirebaseAuth.authStateChanges()
-            ├── Not logged in  →  LoginPage
-            └── Logged in
-                    ├── Hive has data  →  HomePage (fast path)
-                    └── Hive empty     →  Firestore fetch
-                                               ├── Profile found  →  Hive restore  →  HomePage
-                                               └── No profile     →  SetupProfileScreen
-```
-
-**Wishlist Sync**
-
-Every wishlist add/remove writes to Hive immediately (instant UI), then fires a Firestore update in the background (fire-and-forget). On a fresh install the full wishlist is restored from Firestore before navigating to HomePage.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Flutter SDK ≥ 3.x
-- A Firebase project with **Authentication** (Email/Password) and **Firestore** enabled
-- A TMDB API key (v3)
-
-### Setup
-
-1. **Clone the repository**
-
-```bash
-git clone https://github.com/TanvirAhmedCSE/cinevault-movie-and-tv-show-streaming-app.git
-cd cinevault-movie-and-tv-show-streaming-app
-```
-
-2. **Install dependencies**
-
-```bash
-flutter pub get
-```
-
-3. **Firebase setup**
-
-   - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-   - Enable Email/Password authentication
-   - Enable Cloud Firestore
-   - Download `google-services.json` (Android) and/or `GoogleService-Info.plist` (iOS) and place them in the correct platform directories
-   - Run `flutterfire configure` or manually add `firebase_options.dart`
-
-4. **TMDB API key**
-
-   The API key is currently embedded in `api_service.dart`. For production use, move it to a `.env` file or use Flutter's `--dart-define` flag:
-
-   ```bash
-   flutter run --dart-define=TMDB_API_KEY=your_key_here
-   ```
-
-5. **Avatar assets**
-
-   Place your avatar images in `assets/images/`:
-   - `avatar_null_profile_picture.png` — default avatar
-   - `avatar_profile_picture_1.png` through `avatar_profile_picture_24.png` — 24 selectable avatars
-
-   Declare them in `pubspec.yaml`:
-
-   ```yaml
-   flutter:
-     assets:
-       - assets/images/
-   ```
-
-6. **Run the app**
-
-```bash
-flutter run
-```
-
----
-
-## Key Dependencies
-
-```yaml
-dependencies:
-  http: ^1.6.0
-  flutter_rating_bar: ^4.0.1
-  cached_network_image: ^3.2.3
-  flutter_carousel_widget: ^2.1.1
-  url_launcher: ^6.1.10
-  youtube_player_flutter: ^9.0.2
-  google_fonts: ^6.2.1
-  firebase_core: ^3.6.0
-  firebase_auth: ^5.3.1
-  cloud_firestore: ^5.4.4
-  hive_flutter: ^1.1.0
-```
-
----
-
-## Firestore Rules
-
-```js
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // Users can only read/write their own profile
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-  }
-}
-```
-
----
-
 ## Screenshots
 
 <table>
@@ -468,6 +274,200 @@ service cloud.firestore {
     <td align="center"></td>
   </tr>
 </table>
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Flutter (Dart) |
+| Auth & Database | Firebase Authentication + Cloud Firestore |
+| Local Cache | Hive (hive_flutter) |
+| Movie/TV Data | TMDB API v3 |
+| Video Playback | youtube_player_flutter |
+| Image Loading | cached_network_image |
+| Carousel | flutter_carousel_widget |
+| HTTP | http |
+
+---
+
+## Architecture
+
+```
+lib/
+├── constants/
+│   └── constants.dart          # API base URLs and endpoint keys
+├── data/
+│   ├── firebase_service.dart   # Firebase Auth + Firestore operations
+│   ├── hive_service.dart       # Local cache: profile + wishlist
+│   └── wishlist_service.dart   # Unified wishlist (Hive + Firestore sync)
+├── model/
+│   ├── movie_model.dart
+│   ├── tv_model.dart
+│   ├── cast_model.dart
+│   └── video_model.dart
+├── service/
+│   └── api_service.dart        # TMDB API calls
+└── ui/
+    ├── login_page.dart
+    ├── signup_page.dart (sign-up + email verification)
+    ├── setup_profile_screen.dart
+    ├── home.dart               # Bottom nav shell (Movies, TV, Wishlist, Profile)
+    ├── movie/
+    │   ├── movie_page.dart
+    │   ├── movies_category.dart
+    │   ├── movie_details.dart
+    │   └── components/
+    │       ├── movie_carousel.dart
+    │       └── movie_list_item.dart
+    ├── tv/
+    │   ├── tv_page.dart
+    │   ├── tv_category.dart
+    │   ├── tv_details.dart
+    │   └── components/
+    │       ├── tv_carusel.dart
+    │       └── tv_list_item.dart
+    ├── components/
+    │   ├── cast_page.dart
+    │   └── cast_list_item.dart
+    ├── wishlist/
+    │   └── wishlist_screen.dart
+    ├── profile/
+    │   ├── profile_screen.dart
+    │   ├── edit_profile_screen.dart
+    │   ├── change_personal_details_screen.dart
+    │   ├── change_email_screen.dart
+    │   └── change_password_screen.dart
+    ├── genres/
+    │   ├── movie_genres_screen.dart
+    │   ├── movie_genre_details_screen.dart
+    │   ├── movie_all_genres_details_screen.dart
+    │   ├── tv_genres_screen.dart
+    │   ├── tv_genre_details_screen.dart
+    │   └── tv_all_genres_details_screen.dart
+    ├── search/
+    │   ├── movie_search_screen.dart
+    │   └── tv_search_screen.dart
+    ├── see_all/
+    │   ├── see_all_movies_screen.dart
+    │   └── tv_see_all_screen.dart
+    └── cast_detail_screen.dart
+```
+
+**Data Flow**
+
+```
+App Launch
+    └── FirebaseAuth.authStateChanges()
+            ├── Not logged in  →  LoginPage
+            └── Logged in
+                    ├── Hive has data  →  HomePage (fast path)
+                    └── Hive empty     →  Firestore fetch
+                                               ├── Profile found  →  Hive restore  →  HomePage
+                                               └── No profile     →  SetupProfileScreen
+```
+
+**Wishlist Sync**
+
+Every wishlist add/remove writes to Hive immediately (instant UI), then fires a Firestore update in the background (fire-and-forget). On a fresh install the full wishlist is restored from Firestore before navigating to HomePage.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Flutter SDK ≥ 3.x
+- A Firebase project with **Authentication** (Email/Password) and **Firestore** enabled
+- A TMDB API key (v3)
+
+### Setup
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/TanvirAhmedCSE/cinevault-movie-and-tv-show-streaming-app.git
+cd cinevault-movie-and-tv-show-streaming-app
+```
+
+2. **Install dependencies**
+
+```bash
+flutter pub get
+```
+
+3. **Firebase setup**
+
+   - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+   - Enable Email/Password authentication
+   - Enable Cloud Firestore
+   - Download `google-services.json` (Android) and/or `GoogleService-Info.plist` (iOS) and place them in the correct platform directories
+   - Run `flutterfire configure` or manually add `firebase_options.dart`
+
+4. **TMDB API key**
+
+   The API key is currently embedded in `api_service.dart`. For production use, move it to a `.env` file or use Flutter's `--dart-define` flag:
+
+   ```bash
+   flutter run --dart-define=TMDB_API_KEY=your_key_here
+   ```
+
+5. **Avatar assets**
+
+   Place your avatar images in `assets/images/`:
+   - `avatar_null_profile_picture.png` — default avatar
+   - `avatar_profile_picture_1.png` through `avatar_profile_picture_24.png` — 24 selectable avatars
+
+   Declare them in `pubspec.yaml`:
+
+   ```yaml
+   flutter:
+     assets:
+       - assets/images/
+   ```
+
+6. **Run the app**
+
+```bash
+flutter run
+```
+
+---
+
+## Key Dependencies
+
+```yaml
+dependencies:
+  http: ^1.6.0
+  flutter_rating_bar: ^4.0.1
+  cached_network_image: ^3.2.3
+  flutter_carousel_widget: ^2.1.1
+  url_launcher: ^6.1.10
+  youtube_player_flutter: ^9.0.2
+  google_fonts: ^6.2.1
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  hive_flutter: ^1.1.0
+```
+
+---
+
+## Firestore Rules
+
+```js
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only read/write their own profile
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
+```
 
 ---
 
