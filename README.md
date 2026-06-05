@@ -387,8 +387,8 @@ Every wishlist add/remove writes to Hive immediately (instant UI), then fires a 
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/TanvirAhmedCSE/cinevault-movie-and-tv-show-streaming-app.git
-cd cinevault-movie-and-tv-show-streaming-app
+git clone https://github.com/TanvirAhmedCSE/cinevault-movie-and-tv-show-discovery-app-using-tmdb-api.git
+cd cinevault-movie-and-tv-show-discovery-app-using-tmdb-api
 ```
 
 2. **Install dependencies**
